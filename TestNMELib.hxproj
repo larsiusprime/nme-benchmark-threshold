@@ -17,15 +17,15 @@
   <classpaths>
     <class path="src" />
     <class path="t:\development\projects\nme/" />
-    <class path="bin/flash/haxe" />
+    <class path="bin/windows/cpp/haxe" />
   </classpaths>
   <!-- Build options -->
   <build>
-    <option directives="nme4&#xA;nme_ver&#xA;nme_install_tool&#xA;web" />
+    <option directives="nme4&#xA;nme_ver&#xA;nme_install_tool&#xA;windows&#xA;desktop" />
     <option flashStrict="False" />
     <option mainClass="ApplicationMain" />
     <option enabledebug="True" />
-    <option additional="-swf-version 11" />
+    <option additional="--remap flash:nme&#xA;--remap browser:native" />
   </build>
   <!-- haxelib libraries -->
   <haxelib>

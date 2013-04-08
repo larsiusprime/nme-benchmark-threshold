@@ -38,9 +38,12 @@ class Main extends Sprite
 	{
 		if (inited) return;
 		inited = true;
+		
 		testText();
 		
-		stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown, false, 0, true);
+		//testThreshold();
+		testThreshold2();
+		//benchmark();
 	}
 	
 	private function testText():Void {		
@@ -58,7 +61,7 @@ class Main extends Sprite
 			t.y = 70;
 			the_text = t;
 		}
-		the_text.text = "nme.display.BitmapData.threshold() test suite\n Press 1-3 for tests.\n Test 3 is a benchmark and might take a while.";
+		//the_text.text = "nme.display.BitmapData.threshold() test suite\n Press 1-3 for tests.\n Test 3 is a benchmark and might take a while.";
 	}
 
 	private function clear():Void {
@@ -80,7 +83,7 @@ class Main extends Sprite
 		testText();
 	}
 	
-	private function onKeyDown(e:KeyboardEvent):Void {
+	/*private function onKeyDown(e:KeyboardEvent):Void {
 		
 		switch(e.keyCode) {
 			case 49: //"1"
@@ -94,8 +97,8 @@ class Main extends Sprite
 				benchmark();
 		}
 		testText();
-		//trace(e.keyCode);
-	}
+		trace(e.keyCode);
+	}*/
 	
 	private function benchmark():Void{
 		var time:Float = 0;
@@ -182,7 +185,7 @@ class Main extends Sprite
 		
 		addChild(t);
 		
-		var b:BitmapData = Assets.getBitmapData("img/face_sheet.png", false);
+		var b:BitmapData = Assets.getBitmapData("img/greyscale.png", false);
 		
 		t.text = "Test 2:\n6 operations, 1 color test, destPoint offset, " + b.width + "x" + b.height + " pixels";
 		t.text += "\n"+runs + "x runs = " + time + " ms,\nAvg (" + (time / runs) + " ms), Min ("+min+" ms), Max ("+max+" ms)";
@@ -256,7 +259,7 @@ class Main extends Sprite
 			bd_gt_eq = null;
 			bd_blue = null;
 		}else{
-			the_text.text += "\nPixels changed per operation:" + "\n (==): " + eq + ", (<): " + lt + ", (>): " + gt + "\n(!=): " + un_eq + ", (<=): " + lt_eq + ", (>=): " + gt_eq;
+			the_text.text = "\nPixels changed per operation:" + "\n (==): " + eq + ", (<): " + lt + ", (>): " + gt + "\n(!=): " + un_eq + ", (<=): " + lt_eq + ", (>=): " + gt_eq;
 			
 			var txt_eq:TextField = new TextField();
 			txt_eq.x = bmp_eq.x; 
