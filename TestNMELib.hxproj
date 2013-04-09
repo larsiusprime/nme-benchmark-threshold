@@ -15,21 +15,19 @@
   </output>
   <!-- Other classes to be compiled into your SWF -->
   <classpaths>
-    <class path="src" />
-    <class path="t:\development\projects\nme/" />
-    <class path="bin/windows/cpp/haxe" />
+    <class path="." />
   </classpaths>
   <!-- Build options -->
   <build>
-    <option directives="nme4&#xA;nme_ver&#xA;nme_install_tool&#xA;windows&#xA;desktop" />
+    <option directives="" />
     <option flashStrict="False" />
     <option mainClass="ApplicationMain" />
     <option enabledebug="True" />
-    <option additional="--remap flash:nme&#xA;--remap browser:native" />
+    <option additional="" />
   </build>
   <!-- haxelib libraries -->
   <haxelib>
-    <library name="nme" />
+    <!-- example: <library name="..." /> -->
   </haxelib>
   <!-- Class files to compile (other referenced classes will automatically be included) -->
   <compileTargets>

@@ -1,6 +1,7 @@
 package ;
 
 import nme.display.DisplayObject;
+import nme.display.Shape;
 import nme.geom.Point;
 import nme.Assets;
 import nme.display.Bitmap;
@@ -11,6 +12,7 @@ import nme.events.Event;
 import nme.events.KeyboardEvent;
 import nme.Lib;
 import nme.text.TextField;
+import nme.text.TextFormat;
 import nme.utils.ByteArray;
 import nme.utils.Timer;
 
@@ -22,9 +24,7 @@ import nme.utils.Timer;
 class Main extends Sprite 
 {
 	var inited:Bool;
-	
-	private var the_text:TextField;
-
+		
 	/* ENTRY POINT */
 	
 	
@@ -39,85 +39,63 @@ class Main extends Sprite
 		if (inited) return;
 		inited = true;
 		
-		testText();
+		testThreshold(1,20,100);
+		testThreshold2(301,20,100);
+		benchmark(1,220,100);
 		
-		//testThreshold();
-		testThreshold2();
-		//benchmark();
+		drawLines();
 	}
 	
-	private function testText():Void {		
-		if (the_text != null) {
-			if (contains(the_text)){
-				removeChild(the_text);
-			}
-			the_text = null;
-		}
-		if(the_text == null){
-			var t:TextField = new TextField();
-			addChild(t);
-			t.width = stage.stageWidth;
-			t.multiline = true;
-			t.y = 70;
-			the_text = t;
-		}
-		//the_text.text = "nme.display.BitmapData.threshold() test suite\n Press 1-3 for tests.\n Test 3 is a benchmark and might take a while.";
+	private function drawLines():Void {
+		var s:Shape = new Shape();
+		s.graphics.lineStyle(1, 0x000000, 1);
+		s.graphics.drawRect(  1, 1,  599, 480-1);	//outline
+		#if flash
+			s.graphics.beginFill(0xFF0000);
+		#else
+			s.graphics.beginFill(0x0000FF);
+		#end
+		s.graphics.drawRect(  1, 1,  599,  20-1);	//top bar
+		s.graphics.endFill();
+		s.graphics.drawRect(  1, 20, 300, 200);		//left rect
+		s.graphics.drawRect(301, 20, 600-301, 200);	//right rect
+		
+		var t:TextField = new TextField();
+		t.width = 800;
+		var dtf:TextFormat = t.defaultTextFormat;
+		dtf.bold = true;
+		dtf.size = 16;
+		dtf.color = 0xFFFFFF;
+		t.defaultTextFormat = dtf;
+		#if flash
+			t.text = "BitmapData.threshold() : FLASH";
+		#else		
+			t.text = "BitmapData.threshold() : CPP";
+		#end
+		t.y = -2;
+		
+		addChild(s);
+		addChild(t);
 	}
 
-	private function clear():Void {
-		var i:Int = 0;
-		var failsafe:Int = 0;
-		while (i < numChildren && numChildren > 0 && failsafe < 100) {
-			var d:DisplayObject = getChildAt(i);
-			if (d != null) {
-				removeChild(d);
-				if (Std.is(d, Bitmap)) {
-					var b:Bitmap = cast d;
-					b.bitmapData.dispose();
-				}
-				i--;
-			}
-			i++;
-			failsafe++;
-		}
-		testText();
-	}
 	
-	/*private function onKeyDown(e:KeyboardEvent):Void {
-		
-		switch(e.keyCode) {
-			case 49: //"1"
-				clear();
-				testThreshold();
-			case 50: //"2"
-				clear();
-				testThreshold2();
-			case 51: //"3"
-				clear();
-				benchmark();
-		}
-		testText();
-		trace(e.keyCode);
-	}*/
-	
-	private function benchmark():Void{
+	private function benchmark(X:Int=0,Y:Int=0,runs:Int=100):Void{
 		var time:Float = 0;
-		
-		var runs:Int = 100;
 		
 		var max:Float = 0;
 		var min:Float = 999999;
 		
 		for (i in 0...runs) {
 			var final:Bool = i == (runs - 1);
-			var test:Float = _benchmark(final);
+			var test:Float = _benchmark(final,X,Y);
 			if (test > max) { max = test; }
 			if (test < min) { min = test; }
 			time += test;
 		}
 		
 		var t:TextField = new TextField();
-		t.y = 0;
+		t.x = X;
+		t.y = Y;
 		t.width = 400;
 		
 		addChild(t);
@@ -130,7 +108,7 @@ class Main extends Sprite
 		b.dispose();
 	}
 	
-	private function _benchmark(final:Bool):Float{
+	private function _benchmark(final:Bool,X:Int=0,Y:Int=0):Float{
 		var bd:BitmapData = Assets.getBitmapData("img/face_sheet.png",false);
 		
 		var a:Float = Lib.getTimer();
@@ -146,8 +124,8 @@ class Main extends Sprite
 			bd = null;
 		}else{
 			var bmp:Bitmap = new Bitmap(bd);
-			bmp.x = 10;
-			bmp.y = 120;
+			bmp.x = 10 + X;
+			bmp.y = 70 + Y;
 			addChild(bmp);
 			
 			var t:TextField = new TextField();
@@ -158,29 +136,23 @@ class Main extends Sprite
 		return b - a;
 	}
 	
-	private function testThreshold2():Void {
+	private function testThreshold2(X:Int=0,Y:Int=0,runs:Int=100):Void {
 		var time:Float = 0;
-		
-		var runs:Int = 100;
-		
-		for (i in 0...runs) {
-			var final:Bool = i == (runs-1);
-			time += _testThreshold2(final);
-		}
-		
+				
 		var max:Float = 0;
 		var min:Float = 999999;
 		
 		for (i in 0...runs) {
 			var final:Bool = i == (runs - 1);
-			var test:Float = _testThreshold2(final);
+			var test:Float = _testThreshold2(final,X,Y);
 			if (test > max) { max = test; }
 			if (test < min) { min = test; }
 			time += test;
 		}
 		
 		var t:TextField = new TextField();
-		t.y = 0;
+		t.x = X;
+		t.y = Y;
 		t.width = 400;
 		
 		addChild(t);
@@ -193,7 +165,7 @@ class Main extends Sprite
 		b.dispose();
 	}
 	
-	private function _testThreshold2(final:Bool=false):Float{
+	private function _testThreshold2(final:Bool=false,X:Int=0,Y:Int=0):Float{
 
 		var bd_eq:BitmapData = Assets.getBitmapData("img/greyscale.png",false);
 		var bd_lt:BitmapData = Assets.getBitmapData("img/greyscale.png",false);
@@ -202,11 +174,11 @@ class Main extends Sprite
 		var bd_lt_eq:BitmapData = Assets.getBitmapData("img/greyscale.png",false);
 		var bd_gt_eq:BitmapData = Assets.getBitmapData("img/greyscale.png",false);
 		
-		var bd_blue = Assets.getBitmapData("img/bluescale.png",false);
+		var bd_blue = Assets.getBitmapData("img/bluescale.png",false);		
 		
 		var bmp_eq = new Bitmap(bd_eq);
-		bmp_eq.x = 10;
-		bmp_eq.y = the_text.y + the_text.height;
+		bmp_eq.x = 10 + X;
+		bmp_eq.y = 90 + Y;
 		
 		var bmp_lt = new Bitmap(bd_lt);
 		bmp_lt.x = 10 + bmp_eq.x + bmp_eq.width;
@@ -217,7 +189,7 @@ class Main extends Sprite
 		bmp_gt.y = bmp_eq.y;
 		
 		var bmp_un_eq = new Bitmap(bd_un_eq);
-		bmp_un_eq.x = 10;
+		bmp_un_eq.x = 10 + X;
 		bmp_un_eq.y = bmp_eq.y + bmp_eq.height + 20;
 		
 		var bmp_lt_eq = new Bitmap(bd_lt_eq);
@@ -258,8 +230,13 @@ class Main extends Sprite
 			bd_lt_eq = null;
 			bd_gt_eq = null;
 			bd_blue = null;
-		}else{
+		}else {
+			var the_text:TextField = new TextField();
+			the_text.width = 500;
+			the_text.x = bmp_gt.x + bmp_gt.width + 10;
+			the_text.y = bmp_gt.y - 20;
 			the_text.text = "\nPixels changed per operation:" + "\n (==): " + eq + ", (<): " + lt + ", (>): " + gt + "\n(!=): " + un_eq + ", (<=): " + lt_eq + ", (>=): " + gt_eq;
+			addChild(the_text);
 			
 			var txt_eq:TextField = new TextField();
 			txt_eq.x = bmp_eq.x; 
@@ -308,10 +285,9 @@ class Main extends Sprite
 		return b - a;
 	}
 	
-	private function testThreshold():Void {
+	private function testThreshold(X:Int=0,Y:Int=0,runs:Int=100):Void {
 		var time:Float = 0;
-		
-		var runs:Int = 100;
+	
 		
 		var max:Float = 0;
 		var min:Float = 999999;
@@ -319,7 +295,7 @@ class Main extends Sprite
 		
 		for (i in 0...runs) {
 			var final:Bool = i == (runs-1);
-			var test:Float = _testThreshold(final);
+			var test:Float = _testThreshold(final,X,Y);
 			if (test > max) { max = test; }
 			if (test < min) { min = test; }
 			time += test;
@@ -330,7 +306,8 @@ class Main extends Sprite
 		}		
 		
 		var t:TextField = new TextField();
-		t.y = 0;
+		t.y = 0 + Y;
+		t.x = 0 + X;
 		t.width = 400;
 		
 		addChild(t);
@@ -343,7 +320,7 @@ class Main extends Sprite
 		b.dispose();
 	}
 	
-	private function _testThreshold(final:Bool=false):Float{
+	private function _testThreshold(final:Bool = false, X:Int = 0, Y:Int = 0):Float {
 		var bd_eq:BitmapData = Assets.getBitmapData("img/greyscale.png",false);
 		var bd_lt:BitmapData = Assets.getBitmapData("img/greyscale.png",false);
 		var bd_gt:BitmapData = Assets.getBitmapData("img/greyscale.png",false);
@@ -352,8 +329,8 @@ class Main extends Sprite
 		var bd_gt_eq:BitmapData = Assets.getBitmapData("img/greyscale.png",false);
 		
 		var bmp_eq = new Bitmap(bd_eq);
-		bmp_eq.x = 10;
-		bmp_eq.y = the_text.y + the_text.height;
+		bmp_eq.x = 10 + X;
+		bmp_eq.y = 90 + Y;
 		
 		var bmp_lt = new Bitmap(bd_lt);
 		bmp_lt.x = 10 + bmp_eq.x + bmp_eq.width;
@@ -364,7 +341,7 @@ class Main extends Sprite
 		bmp_gt.y = bmp_eq.y;
 		
 		var bmp_un_eq = new Bitmap(bd_un_eq);
-		bmp_un_eq.x = 10;
+		bmp_un_eq.x = 10 + X;
 		bmp_un_eq.y = bmp_eq.y + bmp_eq.height + 20;
 		
 		var bmp_lt_eq = new Bitmap(bd_lt_eq);
@@ -401,7 +378,6 @@ class Main extends Sprite
 			bd_lt_eq = null;
 			bd_gt_eq = null;
 		}else{
-			the_text.text += "\nPixels changed per operation:" + "\n (==): " + eq + ", (<): " + lt + ", (>): " + gt + "\n(!=): " + un_eq + ", (<=): " + lt_eq + ", (>=): " + gt_eq;
 			
 			var txt_eq:TextField = new TextField();
 			txt_eq.x = bmp_eq.x; 
@@ -433,6 +409,14 @@ class Main extends Sprite
 			txt_lt_eq.y = bmp_lt_eq.y - 20; 
 			txt_lt_eq.text = " <= ";
 		
+			var the_text:TextField = new TextField();
+			the_text.width = 500;
+			the_text.x = bmp_gt.x + bmp_gt.width + 10;
+			the_text.y = bmp_gt.y - 20;
+			the_text.text += "\nPixels changed per operation:" + "\n (==): " + eq + ", (<): " + lt + ", (>): " + gt + "\n(!=): " + un_eq + ", (<=): " + lt_eq + ", (>=): " + gt_eq;
+			
+			addChild(the_text);
+			
 			addChild(txt_eq);
 			addChild(txt_lt);
 			addChild(txt_gt);

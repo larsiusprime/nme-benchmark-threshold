@@ -9,7 +9,7 @@
 	<app main="Main" file="TestNMELib" path="bin" />
 	
 	<window background="#ffffff" fps="60" />
-	<window width="800" height="480" unless="mobile" />
+	<window width="600" height="480" unless="mobile" />
 	<window orientation="landscape" vsync="true" antialiasing="0" if="cpp" />
 	
 	<!-- classpath, haxe libs -->
